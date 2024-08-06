@@ -1,8 +1,9 @@
 syntax = "proto3";
-package main;
+package pb;
 
 import "google/protobuf/timestamp.proto";
 
+option go_package = "github.com/illenko/go-grpc-common;pb";
 
 message PaymentRequest {
   string order_id = 1;
@@ -26,3 +27,4 @@ service PaymentService {
   rpc Pay(PaymentRequest) returns (PaymentResponse);
   rpc GetPayment(GetPaymentRequest) returns (PaymentResponse);
 }
+
