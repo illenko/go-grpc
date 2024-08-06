@@ -1,0 +1,28 @@
+syntax = "proto3";
+package main;
+
+import "google/protobuf/timestamp.proto";
+
+
+message PaymentRequest {
+  string order_id = 1;
+  string user_id = 2;
+  double amount = 3;
+}
+
+message GetPaymentRequest {
+  string payment_id = 1;
+}
+
+message PaymentResponse {
+  string payment_id = 1;
+  string order_id = 2;
+  string user_id = 3;
+  double amount = 4;
+  google.protobuf.Timestamp timestamp = 5;
+}
+
+service PaymentService {
+  rpc Pay(PaymentRequest) returns (PaymentResponse);
+  rpc GetPayment(GetPaymentRequest) returns (PaymentResponse);
+}
