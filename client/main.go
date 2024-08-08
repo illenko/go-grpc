@@ -2,16 +2,44 @@ package main
 
 import (
 	"context"
+	"github.com/google/uuid"
+	pb "github.com/illenko/go-grpc-common"
+	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 	"log"
 	"time"
-
-	pb "github.com/illenko/go-grpc-common"
-	"google.golang.org/grpc"
 )
 
+func createGRPCClient(address string) (*grpc.ClientConn, error) {
+	return grpc.Dial(address, grpc.WithTransportCredentials(insecure.NewCredentials()))
+}
+
+func makePayment(ctx context.Context, client pb.PaymentServiceClient) (*pb.PaymentResponse, error) {
+	payReq := &pb.PaymentRequest{
+		OrderId: uuid.New().String(),
+		UserId:  uuid.New().String(),
+		Amount:  100,
+	}
+	payRes, err := client.Pay(ctx, payReq)
+	if err != nil {
+		return nil, err
+	}
+	return payRes, nil
+}
+
+func getPayment(ctx context.Context, client pb.PaymentServiceClient, paymentRequestId string) (*pb.PaymentResponse, error) {
+	getPayReq := &pb.GetPaymentRequest{
+		PaymentId: paymentRequestId,
+	}
+	getPayRes, err := client.GetPayment(ctx, getPayReq)
+	if err != nil {
+		return nil, err
+	}
+	return getPayRes, nil
+}
+
 func main() {
-	conn, err := grpc.NewClient("localhost:50051", grpc.WithTransportCredentials(insecure.NewCredentials()))
+	conn, err := createGRPCClient("localhost:50051")
 	if err != nil {
 		log.Fatalf("did not connect: %v", err)
 	}
@@ -21,25 +49,15 @@ func main() {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()
 
-	// Call Pay method
-	payReq := &pb.PaymentRequest{
-		OrderId: "1",
-		UserId:  "1",
-		Amount:  100,
-	}
-	payRes, err := c.Pay(ctx, payReq)
+	paymentRes, err := makePayment(ctx, c)
 	if err != nil {
 		log.Fatalf("could not pay: %v", err)
 	}
-	log.Printf("Payment Response: %v", payRes)
+	log.Printf("Payment Response: %v", paymentRes)
 
-	// Call GetPayment method
-	getPayReq := &pb.GetPaymentRequest{
-		PaymentId: "1",
-	}
-	getPayRes, err := c.GetPayment(ctx, getPayReq)
+	getPaymentRes, err := getPayment(ctx, c, paymentRes.PaymentId)
 	if err != nil {
 		log.Fatalf("could not get payment: %v", err)
 	}
-	log.Printf("Get Payment Response: %v", getPayRes)
+	log.Printf("Get Payment Response: %v", getPaymentRes)
 }
