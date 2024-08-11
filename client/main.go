@@ -2,12 +2,14 @@ package main
 
 import (
 	"context"
-	pb "github.com/illenko/go-grpc-common"
 	"log"
 	"time"
+
+	pb "github.com/illenko/go-grpc-common"
 )
 
 func main() {
+
 	conn, err := createGRPCClient("localhost:50051")
 	if err != nil {
 		log.Fatalf("did not connect: %v", err)
@@ -18,16 +20,13 @@ func main() {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
-	kafkaWriter := createKafkaWriter([]string{"localhost:9092"}, "payment-status")
-	defer kafkaWriter.Close()
-
-	paymentRes, err := makePayment(ctx, c, kafkaWriter)
+	paymentRes, err := makePayment(ctx, c)
 	if err != nil {
 		log.Fatalf("could not pay: %v", err)
 	}
 	log.Printf("Payment Response: %v", paymentRes)
 
-	getPaymentRes, err := getPayment(ctx, c, kafkaWriter, paymentRes.PaymentId)
+	getPaymentRes, err := getPayment(ctx, c, paymentRes.PaymentId)
 	if err != nil {
 		log.Fatalf("could not get payment: %v", err)
 	}

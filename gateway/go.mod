@@ -1,17 +1,16 @@
-module github.com/illenko/go-grpc-client
+module github.com/illenko/go-grpc-gateway
 
 go 1.22.3
 
 replace github.com/illenko/go-grpc-common => ../common
 
 require (
-	github.com/google/uuid v1.6.0
+	github.com/grpc-ecosystem/grpc-gateway/v2 v2.10.0
 	github.com/illenko/go-grpc-common v0.0.0-00010101000000-000000000000
 	google.golang.org/grpc v1.65.0
 )
 
 require (
-	github.com/grpc-ecosystem/grpc-gateway/v2 v2.10.0 // indirect
 	golang.org/x/net v0.25.0 // indirect
 	golang.org/x/sys v0.20.0 // indirect
 	golang.org/x/text v0.15.0 // indirect

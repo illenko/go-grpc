@@ -2,6 +2,7 @@ syntax = "proto3";
 package pb;
 
 import "google/protobuf/timestamp.proto";
+import "google/api/annotations.proto";
 
 option go_package = "github.com/illenko/go-grpc-common;pb";
 
@@ -25,7 +26,15 @@ message PaymentResponse {
 }
 
 service PaymentService {
-  rpc Pay(PaymentRequest) returns (PaymentResponse);
-  rpc GetPayment(GetPaymentRequest) returns (PaymentResponse);
+  rpc Pay(PaymentRequest) returns (PaymentResponse) {
+    option (google.api.http) = {
+      post: "/v1/payments"
+      body: "*"
+    };
+  }
+  rpc GetPayment(GetPaymentRequest) returns (PaymentResponse) {
+    option (google.api.http) = {
+      get: "/v1/payments/{payment_id}"
+    };
+  }
 }
-

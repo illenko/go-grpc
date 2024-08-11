@@ -4,7 +4,7 @@
 // - protoc             v5.27.3
 // source: common.proto
 
-package common
+package pb
 
 import (
 	context "context"
